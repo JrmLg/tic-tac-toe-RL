@@ -28,6 +28,8 @@ In the package.json file you can find 3 commands:
 - `npm run play:ai` : To play against the AI
 - `npm run play:human` : To play against a friend or alone =)
 
+https://github.com/JrmLg/tic-tac-toe-RL/assets/63566435/d51646d8-b97e-4295-a3fe-a748afabe50e
+
 ## Observations
 
 What I observed:

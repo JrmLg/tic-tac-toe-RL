@@ -8,6 +8,7 @@ export class Agent {
 
     this.statesValues = {}
     this.statesHistory = []
+    this.trainningGameCount = 0
   }
 
   play(game) {
@@ -46,6 +47,7 @@ export class Agent {
       this.statesValues[state] = value + this.learningRate * (this.decayGamma * reward - value)
       reward = this.statesValues[state]
     }
+    this.trainningGameCount++
   }
 
   reset() {
@@ -53,10 +55,18 @@ export class Agent {
   }
 
   savePolicy(file) {
-    fs.writeFileSync(file, JSON.stringify(this.statesValues))
+    fs.writeFileSync(
+      file,
+      JSON.stringify({
+        trainningGameCount: this.trainningGameCount,
+        statesValues: this.statesValues,
+      }),
+    )
   }
 
   loadPolicy(file) {
-    this.statesValues = JSON.parse(fs.readFileSync(file))
+    const data = JSON.parse(fs.readFileSync(file))
+    this.trainningGameCount = data.trainningGameCount
+    this.statesValues = data.statesValues
   }
 }

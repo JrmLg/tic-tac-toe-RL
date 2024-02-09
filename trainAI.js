@@ -1,6 +1,6 @@
 import { Game } from './game.js'
 import { Agent } from './agent.js'
-import { questionYesNo } from './input.js'
+import { questionYesNo, getInteger } from './utils.js'
 
 const game = new Game()
 const a1 = new Agent()
@@ -9,14 +9,18 @@ const a2 = new Agent()
 const resetPolicies = await questionYesNo('Do you want to reset ai policies before trainning ?', false)
 if (!resetPolicies) {
   console.log('Loading existing policies...')
-  a1.loadPolicy('policy1.json')
-  a2.loadPolicy('policy2.json')
+  try {
+    a1.loadPolicy('policy1.json')
+    a2.loadPolicy('policy2.json')
+  } catch (e) {
+    console.log('No existing policies found. Start trainning AI from scratch.')
+  }
 } else {
   console.log('Resetting policies...')
 }
 
-const trainCount = 50000
-const printInterval = Math.floor(trainCount / 1000) - 1
+const trainCount = await getInteger('How many games do you want to train AI with ? ', 50000, (val) => val > 0)
+const printInterval = Math.floor(trainCount / 1000)
 
 function displayLearningProgress(iteration) {
   if (iteration % printInterval === 0) {
@@ -30,13 +34,13 @@ function displayLearningProgress(iteration) {
 
 function giveRewards(game) {
   if (game.isDraw) {
-    a1.learn(0.5)
-    a2.learn(0.5)
+    a1.learn(0)
+    a2.learn(0)
   } else if (game.winner === 'X') {
     a1.learn(1)
-    a2.learn(0)
+    a2.learn(-1)
   } else if (game.winner === 'O') {
-    a1.learn(0)
+    a1.learn(-1)
     a2.learn(1)
   }
 }
@@ -64,6 +68,9 @@ for (let i = 0; i < trainCount; i++) {
   a2.reset()
 }
 
+process.stdout.clearLine()
+process.stdout.cursorTo(0)
+process.stdout.write(`Trainning game : 100%`)
 process.stdout.write('\n')
 console.log('Training complete! For ', trainCount, ' games.')
 
@@ -71,3 +78,4 @@ a1.savePolicy('policy1.json')
 a2.savePolicy('policy2.json')
 
 console.log('Policies are saved in policy1.json and policy2.json')
+process.exit(0)

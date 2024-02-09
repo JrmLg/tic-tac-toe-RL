@@ -1,9 +1,5 @@
-import readline from 'node:readline/promises'
-import { stdin as input, stdout as output } from 'node:process'
-
+import { question } from './utils.js'
 import { Game } from './game.js'
-
-const rl = readline.createInterface({ input, output })
 
 async function playGame() {
   const game = new Game()
@@ -11,7 +7,7 @@ async function playGame() {
 
   while (!game.isFinished) {
     console.log(game.availableMoves())
-    const move = await rl.question('Enter your move: ')
+    const move = await question('Enter your move: ')
     game.play(move)
     game.displayBoard()
     console.log('Game hash |' + game.hash + '|')
@@ -21,3 +17,4 @@ async function playGame() {
 }
 
 playGame()
+process.exit(0)

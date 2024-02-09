@@ -1,13 +1,18 @@
 import { Game } from './game.js'
 import { Agent } from './agent.js'
-import { question, questionYesNo } from './input.js'
+import { question, questionYesNo, formatNumberWithSpaces } from './utils.js'
 
 const game = new Game()
 const a1 = new Agent(0)
 const a2 = new Agent(0)
 
-a1.loadPolicy('policy1.json')
-a2.loadPolicy('policy2.json')
+try {
+  a1.loadPolicy('policy1.json')
+  a2.loadPolicy('policy2.json')
+} catch (e) {
+  console.log("No existing policies found.\nTrying to train ai first with this command : 'npm run train'")
+  process.exit(1)
+}
 
 async function playerFirstGameLoop() {
   while (!game.isFinished) {
@@ -53,6 +58,8 @@ async function aiFirstGameLoop() {
   return game.winner === 'X' ? 'AI' : 'You'
 }
 
+console.log(`First AI opponent has been trained over a total of ${formatNumberWithSpaces(a1.trainningGameCount)} games.`)
+console.log(`Second AI opponent has been trained over a total of ${formatNumberWithSpaces(a2.trainningGameCount)} games.\n`)
 const playerFirst = await questionYesNo('Do you want to play first ?', false)
 
 let winner
@@ -67,3 +74,7 @@ if (winner) {
 } else {
   console.log("It's a draw !")
 }
+
+console.log('')
+
+process.exit(0)

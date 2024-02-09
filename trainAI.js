@@ -34,8 +34,8 @@ function displayLearningProgress(iteration) {
 
 function giveRewards(game) {
   if (game.isDraw) {
-    a1.learn(0)
-    a2.learn(0)
+    a1.learn(0.1)
+    a2.learn(0.2)
   } else if (game.winner === 'X') {
     a1.learn(1)
     a2.learn(-1)
@@ -76,6 +76,9 @@ console.log('Training complete! For ', trainCount, ' games.')
 
 a1.savePolicy('policy1.json')
 a2.savePolicy('policy2.json')
+
+console.log('Agent 1 know ', Object.keys(a1.statesValues).length, ' states of game.')
+console.log('Agent 2 know ', Object.keys(a2.statesValues).length, ' states of game.')
 
 console.log('Policies are saved in policy1.json and policy2.json')
 process.exit(0)

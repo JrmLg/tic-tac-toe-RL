@@ -6,15 +6,13 @@ async function playGame() {
   game.displayBoard()
 
   while (!game.isFinished) {
-    console.log(game.availableMoves())
     const move = await question('Enter your move: ')
     game.play(move)
     game.displayBoard()
-    console.log('Game hash |' + game.hash + '|')
   }
 
   console.log('Winner: ', game.winner)
+  process.exit(0)
 }
 
 playGame()
-process.exit(0)

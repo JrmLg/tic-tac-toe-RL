@@ -1,10 +1,9 @@
 import fs from 'fs'
 
 export class Agent {
-  constructor(name, expRate = 0.3) {
-    this.name = name
-    this.expRate = expRate
-    this.lr = 0.2
+  constructor(epsilon = 0.3) {
+    this.epsilon = epsilon // Exploration rate
+    this.learningRate = 0.2
     this.decayGamma = 0.9
 
     this.statesValues = {}
@@ -12,15 +11,15 @@ export class Agent {
   }
 
   play(game) {
-    let nextAction
     const actions = game.availableMoves()
-    if (actions.length === 0) {
-      throw new Error('No available moves')
-    }
-    if (this.expRate && Math.random() < this.expRate) {
-      nextAction = actions[Math.floor(Math.random() * actions.length)]
+    let nextAction
+
+    if (this.epsilon && Math.random() < this.epsilon) {
+      const randomIdx = Math.floor(Math.random() * actions.length)
+      nextAction = actions[randomIdx]
     } else {
       let maxValue
+
       for (const action of actions) {
         game.play(action)
         const nextHash = game.hash
@@ -44,7 +43,7 @@ export class Agent {
       const state = this.statesHistory[i]
       const value = this.statesValues[state] || 0
 
-      this.statesValues[state] = value + this.lr * (this.decayGamma * reward - value)
+      this.statesValues[state] = value + this.learningRate * (this.decayGamma * reward - value)
       reward = this.statesValues[state]
     }
   }

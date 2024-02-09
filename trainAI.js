@@ -1,50 +1,62 @@
 import { Game } from './game.js'
 import { Agent } from './agent.js'
+import { questionYesNo } from './input.js'
 
 const game = new Game()
-const a1 = new Agent('a1')
-const a2 = new Agent('a2')
+const a1 = new Agent()
+const a2 = new Agent()
 
-// a1.loadPolicy('policy1.json')
-// a2.loadPolicy('policy2.json')
+const resetPolicies = await questionYesNo('Do you want to reset ai policies before trainning ?', false)
+if (!resetPolicies) {
+  console.log('Loading existing policies...')
+  a1.loadPolicy('policy1.json')
+  a2.loadPolicy('policy2.json')
+} else {
+  console.log('Resetting policies...')
+}
 
 const trainCount = 50000
 const printInterval = Math.floor(trainCount / 1000) - 1
 
-for (let i = 0; i < trainCount; i++) {
-  // A game loop
-  if (i % printInterval === 0) {
-    const percentage = ((100 * i) / trainCount).toFixed(1)
+function displayLearningProgress(iteration) {
+  if (iteration % printInterval === 0) {
+    const percentage = ((100 * iteration) / trainCount).toFixed(1)
     process.stdout.clearLine()
     process.stdout.cursorTo(0)
     process.stdout.write(`Trainning game : ${percentage}%`)
     Number.toFixed
   }
+}
+
+function giveRewards(game) {
+  if (game.isDraw) {
+    a1.learn(0.5)
+    a2.learn(0.5)
+  } else if (game.winner === 'X') {
+    a1.learn(1)
+    a2.learn(0)
+  } else if (game.winner === 'O') {
+    a1.learn(0)
+    a2.learn(1)
+  }
+}
+
+for (let i = 0; i < trainCount; i++) {
+  // A game loop
+  displayLearningProgress(i)
 
   while (!game.isFinished) {
     a1.play(game)
 
     if (game.isFinished) {
-      if (game.winner === 'X') {
-        a1.learn(1)
-        a2.learn(0)
-      } else {
-        a1.learn(0.1)
-        a2.learn(0.5)
-      }
+      giveRewards(game)
       continue
     }
 
     a2.play(game)
 
     if (game.isFinished) {
-      if (game.winner === 'O') {
-        a1.learn(0)
-        a2.learn(1)
-      } else {
-        a1.learn(0.1)
-        a2.learn(0.5)
-      }
+      giveRewards(game)
     }
   }
   game.newGame()

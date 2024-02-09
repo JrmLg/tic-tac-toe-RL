@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "train": "node ./trainAI.js",
+    "play:ai": "node ./playAI.js",
+    "play:human": "node ./playHuman.js"
   },
   "keywords": [],
   "author": "",
